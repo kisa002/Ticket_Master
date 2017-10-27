@@ -7,16 +7,26 @@ public class PlayerControl : MonoBehaviour {
 
 
     public int hp;
+    int totalHP;
     public GameObject hpDownEffect;
     public Text hpDownNumLabel;
     public Image hpGauge;
     public Image playerSprite;
     public Text totalHpLabel;
     public Text hpLabel;
+    public Text effectLabel;
+
+    public PlayerControl otherPlayerControl;
+
+    public GameManager _gameManager;
+
+    public Animator _animator;
+    public bool MainPlayer;
 
     void Start()
     {
-        totalHpLabel.text = "/ " + hp.ToString();
+        totalHP = hp;
+        totalHpLabel.text = "/ " + totalHP.ToString();
     }
 
     public void HpControl(int num)
@@ -45,21 +55,27 @@ public class PlayerControl : MonoBehaviour {
         {
             for (int i = 0; i < num; i++)
             {
-                hp++;
-                hpGauge.fillAmount = (float)hp / 200;
-                hpLabel.text = hp.ToString();
-                yield return hpDownDelay;
+                if(hp < totalHP)
+                {
+                    hp++;
+                    hpGauge.fillAmount = (float)hp / 200;
+                    hpLabel.text = hp.ToString();
+                    yield return hpDownDelay;
+                }
             }
         }
         else
         {
-            for (int i = 0; i < -num; i++)
+            if (hp > 0)
             {
-                hp--;
-                hpGauge.fillAmount = (float)hp / 200;
-                hpLabel.text = hp.ToString();
-                yield return hpDownDelay;
-            }
+                for (int i = 0; i < -num; i++)
+                {
+                    hp--;
+                    hpGauge.fillAmount = (float)hp / 200;
+                    hpLabel.text = hp.ToString();
+                    yield return hpDownDelay;
+                }
+            }                
         }
     }
 
@@ -80,6 +96,58 @@ public class PlayerControl : MonoBehaviour {
             playerSprite.color = Color.white;
         }
     }
+
+    public void Fight()
+    {
+        int num = Random.Range(-60, 60);
+        if (num < 0)
+        {
+            otherPlayerControl.HpControl(num);
+            _animator.SetTrigger("Attack");
+            if (MainPlayer)
+            {
+                if (num < -50)
+                {
+                    effectLabel.text = _gameManager.effectString[0];
+                }
+                else if (num < -40)
+                {
+                    effectLabel.text = _gameManager.effectString[1];
+
+                }
+                else if (num < -30)
+                {
+                    effectLabel.text = _gameManager.effectString[2];
+
+                }
+                else if (num < -20)
+                {
+                    effectLabel.text = _gameManager.effectString[3];
+                }
+                else if (num < -10)
+                {
+                    effectLabel.text = _gameManager.effectString[4];
+                }
+                else
+                {
+                    effectLabel.text = _gameManager.effectString[5];
+                }
+
+            }            
+        }
+        else
+        {
+            HpControl(num);
+            _animator.SetTrigger("Attack");
+            if (MainPlayer)
+            {
+                effectLabel.text = _gameManager.effectString[6];
+            }
+        }
+    }
+    
+
+    
 
 
 

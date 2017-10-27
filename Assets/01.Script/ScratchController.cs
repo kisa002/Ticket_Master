@@ -9,7 +9,6 @@ public class ScratchController : MonoBehaviour {
     float prev = -1;
     float current = -1;
 
-
 	// Use this for initialization
 	void Start () {
         float width = transform.parent.transform.position.x;
@@ -21,7 +20,7 @@ public class ScratchController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        //CheckMouse();
+        //CheckMouse(); 
 	}
 
     //void CheckMouse()

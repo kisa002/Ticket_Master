@@ -37,7 +37,39 @@ public class RandomManager : MonoBehaviour {
     {
         for (int i = 0; i < 3; i++)
         {
-            randomData[i].Init(Random.Range(1, 100), Random.Range(1, 3));
+            int tmp = (int)Random.Range(0, 6);
+
+            switch(tmp)
+            {
+                case 0:
+                    tmp = 5;
+                    break;
+
+                case 1:
+                    tmp = 10;
+                    break;
+
+                case 2:
+                    tmp = 20;
+                    break;
+
+                case 3:
+                    tmp = 30;
+                    break;
+
+                case 4:
+                    tmp = 45;
+                    break;
+
+                case 5:
+                    tmp = 65;
+                    break;
+
+                case 6:
+                    tmp = 80;
+                    break;
+            }
+            randomData[i].Init(tmp, Random.Range(1, 3));
 
             randomPercent[i].text = randomData[i].GetPercent().ToString() + "%";
         }

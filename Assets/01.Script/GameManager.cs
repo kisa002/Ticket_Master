@@ -10,10 +10,19 @@ public class GameManager : MonoBehaviour {
     public GameObject[] timeGaugeObject;
 
     public GameObject[] refreshTicket;
+    public PlayerControl[] _playerControl;
+
+    public string[] effectString;
+
+    public GameObject startBack;
+    public GAui[] startPlayerGaui;
+
     // Use this for initialization
     void Start () {
-		
-	}
+        StartGame();
+
+    }
+    
 	
 	// Update is called once per frame
 	void Update () {
@@ -22,7 +31,7 @@ public class GameManager : MonoBehaviour {
 
     void StartGame()
     {
-
+        StartCoroutine("StartCoroutine");
     }
     
 
@@ -31,6 +40,24 @@ public class GameManager : MonoBehaviour {
     {
         StopCoroutine("TimeCountDownCoroutine");
         StartCoroutine("TimeCountDownCoroutine");
+    }
+
+    IEnumerator StartCoroutine()
+    {
+        startBack.SetActive(true);
+        yield return new WaitForSeconds(1);
+        for (int i = 0; i < startPlayerGaui.Length; i++)
+        {
+            startPlayerGaui[i].gameObject.SetActive(true);
+            startPlayerGaui[i].MoveIn();
+        }
+        yield return new WaitForSeconds(3.6f);
+        for (int i = 0; i < startPlayerGaui.Length; i++)
+        {
+            startPlayerGaui[i].MoveOut();
+        }
+        yield return new WaitForSeconds(0.6f);
+        startBack.SetActive(false);
     }
     WaitForSeconds timeCountDownDelay = new WaitForSeconds(1f);
     IEnumerator TimeCountDownCoroutine()
@@ -61,5 +88,17 @@ public class GameManager : MonoBehaviour {
     public void Refresh()
     {
 
+    }
+
+    public void FightStart()
+    {
+        StartCoroutine("FightCoroutine");
+    }
+    IEnumerator FightCoroutine()
+    {
+        yield return new WaitForSeconds(0.4f);
+        _playerControl[0].Fight();
+        yield return new WaitForSeconds(1f);
+        _playerControl[1].Fight();
     }
 }
