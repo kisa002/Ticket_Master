@@ -12,8 +12,11 @@ public class ScratchManager : MonoBehaviour {
     float hiddenWidth = -1;
     float hiddenHeight = -1;
 
-	// Use this for initialization
-	void Start () {
+    public List<GameObject> hiddenPool = new List<GameObject>();
+    public GameManager _gameManager;
+
+    // Use this for initialization
+    void Start () {
         width = this.gameObject.GetComponent<RectTransform>().rect.width;
         height = this.gameObject.GetComponent<RectTransform>().rect.height;
 
@@ -23,17 +26,51 @@ public class ScratchManager : MonoBehaviour {
         StartHidden();
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
+    public void Scratch()
+    {
+        int leftCount = hiddenPool.Count;
+        for (int i = 0; i < hiddenPool.Count; i++)
+        {
+            if (!hiddenPool[i].activeSelf)
+            {
+                leftCount--;
+            }
+        }
+        if(leftCount < 60)
+        {
+            if (!_gameManager.fight)
+            {
+                _gameManager.FightStart();
+                
+                for (int i = 0; i < hiddenPool.Count; i++)
+                {
+                    hiddenPool[i].SetActive(false);
+                }
+            }
+        }
+    }
+
+    GameObject blockPrefab;
     void StartHidden()
     {
-        for (int i=0; i<width; i += (int)hiddenWidth)
-            for(int j=0; j<height; j += (int)hiddenHeight)
-                Instantiate(imageHidden, new Vector2(transform.position.x - (width / 2) + i, transform.position.y - (height / 2) + j), Quaternion.identity).transform.SetParent(this.gameObject.transform);
+        hiddenPool.Clear();
+        for (int i = 0; i < width; i += (int)hiddenWidth)
+        {
+            for (int j = 0; j < height; j += (int)hiddenHeight)
+            {
+                GameObject hidden = (GameObject)Instantiate(imageHidden);
+                hidden.transform.SetParent(this.gameObject.transform);
+                hidden.GetComponent<RectTransform>().localPosition = new Vector2((-width / 2) + i, (-height / 2) + j);
+                hidden.GetComponent<RectTransform>().localScale = Vector3.one;
+                hiddenPool.Add(hidden);
+            }
+        }
 
+
+                //Instantiate(imageHidden, new Vector2(transform.position.x - (width / 2) + i, transform.position.y - (height / 2) + j), Quaternion.identity).transform.SetParent(this.gameObject.transform);
+
+        //for (float i = startHeight; i < stopHeight; i += width)
         //for (float i = startHeight; i < stopHeight; i += width)
         //    for (float j = startWidth; j < stopWidth; j += height)
         //        //Debug.Log(i);

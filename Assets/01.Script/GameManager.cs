@@ -10,16 +10,29 @@ public class GameManager : MonoBehaviour {
     public GameObject[] timeGaugeObject;
 
     public GameObject[] refreshTicket;
+    public GameObject[] refreshTicketEffect;
     public PlayerControl[] _playerControl;
+    public RandomManager _randomManager;
 
     public string[] effectString;
+    public bool fight;
 
     public GameObject startBack;
     public GAui[] startPlayerGaui;
+    public GAui vsGaui;
+
+
+
+    public static List<GameObject> hiddenEffectPool = new List<GameObject>();
+    public GameObject hiddenEffectPrefab;
+    public Transform objectBox;
+
 
     // Use this for initialization
     void Start () {
+        Application.targetFrameRate = 60;
         StartGame();
+        CreateHiddenEffect();
 
     }
     
@@ -29,6 +42,19 @@ public class GameManager : MonoBehaviour {
 		
 	}
 
+
+
+    void CreateHiddenEffect()
+    {
+        for (int i = 0; i < 60; i++)
+        {
+            GameObject hiddenEffect = (GameObject)Instantiate(hiddenEffectPrefab);
+            hiddenEffect.name = "hidden_" + i.ToString();
+            hiddenEffect.SetActive(false);
+            hiddenEffect.transform.SetParent(objectBox);
+            hiddenEffectPool.Add(hiddenEffect);
+        }
+    }
     void StartGame()
     {
         StartCoroutine("StartCoroutine");
@@ -36,15 +62,18 @@ public class GameManager : MonoBehaviour {
     
 
 
-    public void NextTurn()
+    public void TimeCountDown()
     {
         StopCoroutine("TimeCountDownCoroutine");
         StartCoroutine("TimeCountDownCoroutine");
+
     }
 
     IEnumerator StartCoroutine()
     {
         startBack.SetActive(true);
+        vsGaui.gameObject.SetActive(true);
+        vsGaui.MoveIn();
         yield return new WaitForSeconds(1);
         for (int i = 0; i < startPlayerGaui.Length; i++)
         {
@@ -56,6 +85,7 @@ public class GameManager : MonoBehaviour {
         {
             startPlayerGaui[i].MoveOut();
         }
+        vsGaui.MoveOut();
         yield return new WaitForSeconds(0.6f);
         startBack.SetActive(false);
     }
@@ -80,6 +110,7 @@ public class GameManager : MonoBehaviour {
             if (refreshTicket[i].activeSelf)
             {
                 refreshTicket[i].SetActive(false);
+                refreshTicketEffect[i].SetActive(true);
                 break;
             }
         }
@@ -87,11 +118,18 @@ public class GameManager : MonoBehaviour {
     }
     public void Refresh()
     {
-
+        _randomManager.RandomMix();
     }
 
     public void FightStart()
     {
+        fight = true;
+        StopCoroutine("TimeCountDownCoroutine");
+        for (int i = 0; i < timeGaugeObject.Length; i++)
+        {
+            timeGaugeObject[i].SetActive(false);
+        }
+
         StartCoroutine("FightCoroutine");
     }
     IEnumerator FightCoroutine()
@@ -100,5 +138,9 @@ public class GameManager : MonoBehaviour {
         _playerControl[0].Fight();
         yield return new WaitForSeconds(1f);
         _playerControl[1].Fight();
+        yield return new WaitForSeconds(1f);
+        fight = false;
+        Refresh();
+        
     }
 }
