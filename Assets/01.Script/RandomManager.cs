@@ -50,6 +50,19 @@ public class RandomManager : MonoBehaviour {
 
             scratchSprite[i] = random[i].transform.Find("Scratch").gameObject;
         }
+
+        //skillSprite[0] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.atk.01");
+        //skillSprite[1] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
+        //skillSprite[2] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
+        //skillSprite[3] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
+        //skillSprite[4] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
+        //skillSprite[5] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
+        //skillSprite[6] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
+        //skillSprite[7] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
+        //skillSprite[8] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
+        //skillSprite[9] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
+        //skillSprite[10] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
+        //skillSprite[11] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
     }
 
     public void RandomMix()
@@ -97,6 +110,8 @@ public class RandomManager : MonoBehaviour {
                 scratchSprite[i].GetComponent<Image>().sprite = _gameManager.scratchSprite[0, (int)Random.Range(1, 9)];
             else
                 scratchSprite[i].GetComponent<Image>().sprite = _gameManager.scratchSprite[1, (int)Random.Range(1, 9)];
+
+            randomData[i].Init(randomData[i].GetPercent(), 0, randomData[i].GetType()); //ERROR시 제거.
 
             randomPercent[i].text = randomData[i].GetPercent().ToString() + "%";
             skillImage[i].sprite = skillSprite[randomData[i].GetType()];

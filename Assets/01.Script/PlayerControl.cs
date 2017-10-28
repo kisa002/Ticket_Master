@@ -106,7 +106,7 @@ public class PlayerControl : MonoBehaviour {
     public void Fight()
     {
         //int num = Random.Range(-60, 60);
-        int num = randomManager.randomData[posNum].GetDamage();
+        int num = -randomManager.randomData[posNum].GetDamage();
         //Debug.Log("Fight : " + num);
 
         if (num < 0)
