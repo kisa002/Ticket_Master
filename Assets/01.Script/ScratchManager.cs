@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ScratchManager : MonoBehaviour {
 
@@ -15,6 +16,8 @@ public class ScratchManager : MonoBehaviour {
     public List<GameObject> hiddenPool = new List<GameObject>();
     public GameManager _gameManager;
 
+    public Sprite test;
+
     // Use this for initialization
     void Start () {
         width = this.gameObject.GetComponent<RectTransform>().rect.width;
@@ -22,6 +25,8 @@ public class ScratchManager : MonoBehaviour {
 
         hiddenWidth = imageHidden.GetComponent<RectTransform>().rect.width;
         hiddenHeight = imageHidden.GetComponent<RectTransform>().rect.height;
+        
+        //this.gameObject.GetComponent<Image>().sprite = _gameManager.scratchSprite[0, 3];
 
         StartHidden();
 	}
@@ -41,6 +46,7 @@ public class ScratchManager : MonoBehaviour {
         {
             if (!_gameManager.fight)
             {
+                if(this.gameObject.transform.parent)
                 _gameManager.FightStart();
                 
                 for (int i = 0; i < hiddenPool.Count; i++)

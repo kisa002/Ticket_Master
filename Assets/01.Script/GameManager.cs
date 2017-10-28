@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour {
     public GAui[] startPlayerGaui;
     public GAui vsGaui;
 
+    public Sprite[,] scratchSprite = new Sprite[2,9];
+
 
 
     public static List<GameObject> hiddenEffectPool = new List<GameObject>();
@@ -29,11 +31,17 @@ public class GameManager : MonoBehaviour {
 
 
     // Use this for initialization
-    void Start () {
+    void Awake () {
         Application.targetFrameRate = 60;
         StartGame();
         CreateHiddenEffect();
 
+        for (int i = 0; i < 2; i++)
+            for (int j = 0; j < 9; j++)
+                if (i == 0)
+                    scratchSprite[i, j] = Resources.Load<Sprite>("ticket_inside/img.hide.get.0" + (j+1));
+                else
+                    scratchSprite[i, j] = Resources.Load<Sprite>("ticket_inside/img.hide.lose.0" + (j+1));
     }
     
 	

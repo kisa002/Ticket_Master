@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class RandomManager : MonoBehaviour {
 
     GameObject[] random = new GameObject[3];
-    RandomData[] randomData = new RandomData[3];
+    public RandomData[] randomData = new RandomData[3];
 
     Text[] randomPercent = new Text[3];
     Text[] randomSkill = new Text[3];
@@ -16,12 +16,21 @@ public class RandomManager : MonoBehaviour {
     public Sprite[] skillSprite;
     Image[] skillImage = new Image[3];
 
+    GameObject[] scratchSprite = new GameObject[3];
+
     public ScratchManager[] _scratchManager;
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+
+    private void Awake()
+    {
+        //Init();
+        //RandomMix();
+    }
+
+    void Start () {
         Init();
         RandomMix();
-	}
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -38,6 +47,8 @@ public class RandomManager : MonoBehaviour {
             randomPercent[i] = random[i].transform.Find("Percent").transform.Find("TextPercent").GetComponent<Text>();
             skillImage[i] = random[i].transform.Find("Skill").GetComponent<Image>();
             mask[i] = random[i].transform.Find("Mask").gameObject;
+
+            scratchSprite[i] = random[i].transform.Find("Scratch").gameObject;
         }
     }
 
@@ -81,15 +92,23 @@ public class RandomManager : MonoBehaviour {
             {
                 randomData[i].Init(80, 20, Random.Range(0, 3));
             }
+
+            if (randomData[i].GetPercent() > (int)Random.Range(1, 100))
+                scratchSprite[i].GetComponent<Image>().sprite = _gameManager.scratchSprite[0, (int)Random.Range(1, 9)];
+            else
+                scratchSprite[i].GetComponent<Image>().sprite = _gameManager.scratchSprite[1, (int)Random.Range(1, 9)];
+
             randomPercent[i].text = randomData[i].GetPercent().ToString() + "%";
             skillImage[i].sprite = skillSprite[randomData[i].GetType()];
             mask[i].SetActive(false);
             _gameManager.TimeCountDown();
         }
+
+        //Debug.Log(randomData[0].GetPercent() + " / " + randomData[0].GetDamage());
     }
 }
 
-class RandomData
+public class RandomData
 {
     int percent = -1;
     int damage = -1;
@@ -107,8 +126,14 @@ class RandomData
         return percent;
     }
 
+    public int GetDamage()
+    {
+        return damage;
+    }
+
     public int GetType()
     {
         return type;
     }
+
 }

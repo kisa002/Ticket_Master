@@ -20,13 +20,19 @@ public class PlayerControl : MonoBehaviour {
 
     public GameManager _gameManager;
 
+    RandomManager randomManager;
+
     public Animator _animator;
     public bool MainPlayer;
+
+    public int posNum;
 
     void Start()
     {
         totalHP = hp;
         totalHpLabel.text = "/ " + totalHP.ToString();
+
+        randomManager = GameObject.Find("RandomManager").GetComponent<RandomManager>();
     }
 
     public void HpControl(int num)
@@ -99,7 +105,10 @@ public class PlayerControl : MonoBehaviour {
 
     public void Fight()
     {
-        int num = Random.Range(-60, 60);
+        //int num = Random.Range(-60, 60);
+        int num = randomManager.randomData[posNum].GetDamage();
+        //Debug.Log("Fight : " + num);
+
         if (num < 0)
         {
             otherPlayerControl.HpControl(num);

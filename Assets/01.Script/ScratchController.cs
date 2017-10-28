@@ -1,21 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ScratchController : MonoBehaviour {
 
     GameObject hiddenMask;
 
-    float prev = -1;
-    float current = -1;
+    float mousePrev = -1;
+    float mouseCurrent = -1;
+
     RandomManager _randomManager;
     int posNum;
     ScratchManager _scratchManager;
+
+    PlayerControl playerControl;
 
     // Use this for initialization
     void Start () {
         float width = transform.parent.transform.position.x;
         float height = transform.parent.transform.position.y;
+
+        playerControl = GameObject.Find("Player_Main").GetComponent<PlayerControl>();
 
         hiddenMask = this.gameObject.transform.Find("ImageHiddenMask").gameObject;
         hiddenMask.transform.position = new Vector2(width, height);
@@ -37,6 +43,17 @@ public class ScratchController : MonoBehaviour {
 
     public void Explode()
     {
+        playerControl.posNum = posNum;
+
+        if (mousePrev == -1)
+        {
+            mousePrev = Input.mousePosition.x;
+            mouseCurrent = mousePrev;
+        }
+
+        //Debug.Log(this.gameObject.transform.worldToLocalMatrix);
+        Debug.Log(Input.mousePosition + " / " + transform.position);
+
         for (int j = 0; j < GameManager.hiddenEffectPool.Count; j++)
         {
             if (!GameManager.hiddenEffectPool[j].activeSelf)
@@ -59,6 +76,11 @@ public class ScratchController : MonoBehaviour {
     void Update () {
         //CheckMouse();
 	}
+
+    void ChangeSprite()
+    {
+
+    }
 
     //void CheckMouse()
     //{
