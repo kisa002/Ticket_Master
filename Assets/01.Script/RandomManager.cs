@@ -19,17 +19,14 @@ public class RandomManager : MonoBehaviour {
     GameObject[] scratchSprite = new GameObject[3];
 
     public ScratchManager[] _scratchManager;
-    // Use this for initialization
 
-    private void Awake()
-    {
-        //Init();
-        //RandomMix();
-    }
+    public Text[] damageLabel;
+    public bool scratching;
+    // Use this for initialization
 
     void Start () {
         Init();
-        RandomMix();
+        //RandomMix();
     }
 	
 	// Update is called once per frame
@@ -64,9 +61,14 @@ public class RandomManager : MonoBehaviour {
         //skillSprite[10] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
         //skillSprite[11] = Resources.Load<Sprite>("ConfirmImage/icon/skillicon.");
     }
-
+    public bool refresh;
     public void RandomMix()
     {
+        int[] randomMixNum = new int[3];
+        for (int i = 0; i < randomMixNum.Length; i++)
+        {
+            randomMixNum[i] = -1;
+        }
         for (int i = 0; i < _scratchManager.Length; i++)
         {
             for (int j = 0; j < _scratchManager[i].hiddenPool.Count; j++)
@@ -76,49 +78,76 @@ public class RandomManager : MonoBehaviour {
         }
         for (int i = 0; i < 3; i++)
         {
-            int randomNum = Random.Range(0,7);
-            if(randomNum == 0)
+            int randomNum = Random.Range(0,6);
+            randomMixNum[i] = randomNum;
+            if(i > 0)
             {
-                randomData[i].Init(5, 200, Random.Range(0, 3));
+                while (randomMixNum[i - 1] == randomNum)
+                {
+                    randomNum = Random.Range(0, 6);
+                }
+            }
+            else if (i > 1)
+            {
+                while (randomMixNum[i - 1] == randomNum || randomMixNum[i - 2] == randomNum)
+                {
+                    randomNum = Random.Range(0, 6);
+                }
+            }
+
+            if (randomNum == 0)
+            {
+                randomData[i].Init(5, 200, 5);
             }
             else if (randomNum == 1)
             {
-                randomData[i].Init(10, 140, Random.Range(0, 3));
+                randomData[i].Init(10, 140, 4);
             }
             else if (randomNum == 2)
             {
-                randomData[i].Init(20, 80, Random.Range(0, 3));
+                randomData[i].Init(20, 85, 3);
             }
             else if (randomNum == 3)
             {
-                randomData[i].Init(30, 70, Random.Range(0, 3));
+                randomData[i].Init(35, 55, 2);
             }
             else if (randomNum == 4)
             {
-                randomData[i].Init(45, 45, Random.Range(0, 3));
+                randomData[i].Init(65, 25, 1);
             }
             else if (randomNum == 5)
             {
-                randomData[i].Init(65, 30, Random.Range(0, 3));
-            }
-            else if (randomNum == 6)
-            {
-                randomData[i].Init(80, 20, Random.Range(0, 3));
+                randomData[i].Init(80, 15, 0);
             }
 
-            if (randomData[i].GetPercent() > (int)Random.Range(1, 100))
-                scratchSprite[i].GetComponent<Image>().sprite = _gameManager.scratchSprite[0, (int)Random.Range(1, 9)];
+
+           // if (randomData[i].GetPercent() > (int)Random.Range(1, 100))
+             if (randomData[i].GetPercent() > (int)Random.Range(1, 100))
+                    scratchSprite[i].GetComponent<Image>().sprite = _gameManager.scratchSprite[0, (int)Random.Range(1, 9)];
             else
+            {
                 scratchSprite[i].GetComponent<Image>().sprite = _gameManager.scratchSprite[1, (int)Random.Range(1, 9)];
-
-            randomData[i].Init(randomData[i].GetPercent(), 0, randomData[i].GetType()); //ERROR시 제거.
+                randomData[i].Init(randomData[i].GetPercent(), 0, randomData[i].GetType()); //ERROR시 제거.
+            }
 
             randomPercent[i].text = randomData[i].GetPercent().ToString() + "%";
+            damageLabel[i].text = randomData[i].GetDamage().ToString();
             skillImage[i].sprite = skillSprite[randomData[i].GetType()];
             mask[i].SetActive(false);
+            _gameManager.reTicketButton.SetActive(false);
+
+
+            scratching = false;
+            _gameManager._playerControl[0].effectLabel.text = "복권을 긁자!!";
+        }
+        if (refresh)
+        {
+            refresh = false;
+        }
+        else
+        {
             _gameManager.TimeCountDown();
         }
-
         //Debug.Log(randomData[0].GetPercent() + " / " + randomData[0].GetDamage());
     }
 }

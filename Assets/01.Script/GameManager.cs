@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour {
     public GameObject startBack;
     public GAui[] startPlayerGaui;
     public GAui vsGaui;
+    public GameObject reTicketButton;
 
     public Sprite[,] scratchSprite = new Sprite[2,9];
 
@@ -29,10 +30,23 @@ public class GameManager : MonoBehaviour {
     public GameObject hiddenEffectPrefab;
     public Transform objectBox;
 
+    public GAui gameOverGaui;
+    public GameObject gameOverMask;
+    public Text gameOverLabel;
+
+    public GameObject[] ticket;
+
+    public AudioSource _audioSource;
+    public AudioClip[] effectSound;
+    public AudioClip xSound;
+    public AudioClip warningSound;
+
+    public AudioSource musicManager;
+
 
     // Use this for initialization
     void Awake () {
-        Application.targetFrameRate = 60;
+        //Application.targetFrameRate = 60;
         StartGame();
         CreateHiddenEffect();
 
@@ -79,6 +93,7 @@ public class GameManager : MonoBehaviour {
 
     IEnumerator StartCoroutine()
     {
+        StopCoroutine("TimeCountDownCoroutine");
         startBack.SetActive(true);
         vsGaui.gameObject.SetActive(true);
         vsGaui.MoveIn();
@@ -96,10 +111,14 @@ public class GameManager : MonoBehaviour {
         vsGaui.MoveOut();
         yield return new WaitForSeconds(0.6f);
         startBack.SetActive(false);
+        _randomManager.RandomMix();
+        
     }
+    public bool timeCountDownEnd;
     WaitForSeconds timeCountDownDelay = new WaitForSeconds(1f);
     IEnumerator TimeCountDownCoroutine()
     {
+        timeCountDownEnd = false;
         for (int i = 0; i < timeGaugeObject.Length; i++)
         {
             timeGaugeObject[i].SetActive(true);
@@ -109,20 +128,31 @@ public class GameManager : MonoBehaviour {
             timeGaugeObject[i].SetActive(false);
             yield return timeCountDownDelay;
         }
+        timeCountDownEnd = true;
+        FightStart();
     }
 
     public void RefreshTicketUse()
     {
-        for (int i = refreshTicket.Length - 1; i >= 0; i--)
+        for (int i = 0; i < ticket.Length; i++)
         {
-            if (refreshTicket[i].activeSelf)
+            if (ticket[i].activeSelf)
             {
-                refreshTicket[i].SetActive(false);
-                refreshTicketEffect[i].SetActive(true);
+                _randomManager.refresh = true;
+                for (int j = refreshTicket.Length - 1; j >= 0; j--)
+                {
+                    if (refreshTicket[j].activeSelf)
+                    {
+                        refreshTicket[j].SetActive(false);
+                        refreshTicketEffect[j].SetActive(true);
+                        break;
+                    }
+                }
+                Refresh();
                 break;
             }
         }
-        Refresh();
+        
     }
     public void Refresh()
     {
@@ -144,11 +174,58 @@ public class GameManager : MonoBehaviour {
     {
         yield return new WaitForSeconds(0.4f);
         _playerControl[0].Fight();
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
         _playerControl[1].Fight();
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.8f);
         fight = false;
-        Refresh();
-        
+        if(_playerControl[0].hp <= 0)
+        {
+            gameOverLabel.text = "패배..";
+            GameOver();
+        }
+        else if (_playerControl[1].hp <= 0)
+        {
+            gameOverLabel.text = "승리!!";
+            GameOver();
+            _playerControl[1]._animator.SetTrigger("Die");
+        }
+        else
+        {
+            Refresh();
+        }        
     }
+
+    public void GameOver()
+    {
+        gameOverMask.SetActive(true);
+        gameOverGaui.gameObject.SetActive(true);
+        gameOverGaui.MoveIn();
+    }
+
+    public void ReStart()
+    {
+        StartGame();
+        musicManager.Stop();
+        musicManager.Play();
+        for (int i = 0; i < 2; i++)
+        {
+            _playerControl[i]._animator.SetTrigger("ReStart");
+            _playerControl[i].hp = 200;
+            _playerControl[i].HpSet();
+        }
+        for (int i = 0; i < refreshTicket.Length; i++)
+        {
+            refreshTicket[i].SetActive(true);
+        }
+    }
+
+    public void EffectSoundPlay(int num)
+    {
+        _audioSource.PlayOneShot(effectSound[num]);
+    }
+    public void WarningSoundPlay()
+    {
+        _audioSource.PlayOneShot(warningSound);
+    }
+
 }

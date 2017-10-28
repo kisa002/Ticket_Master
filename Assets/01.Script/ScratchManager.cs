@@ -16,6 +16,8 @@ public class ScratchManager : MonoBehaviour {
     public List<GameObject> hiddenPool = new List<GameObject>();
     public GameManager _gameManager;
 
+    NetworkManager networkManager;
+
     public Sprite test;
 
     // Use this for initialization
@@ -25,8 +27,8 @@ public class ScratchManager : MonoBehaviour {
 
         hiddenWidth = imageHidden.GetComponent<RectTransform>().rect.width;
         hiddenHeight = imageHidden.GetComponent<RectTransform>().rect.height;
+
         
-        //this.gameObject.GetComponent<Image>().sprite = _gameManager.scratchSprite[0, 3];
 
         StartHidden();
 	}
@@ -42,7 +44,7 @@ public class ScratchManager : MonoBehaviour {
                 leftCount--;
             }
         }
-        if(leftCount < 60)
+        if(leftCount < 90)
         {
             if (!_gameManager.fight)
             {

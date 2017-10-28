@@ -52,7 +52,6 @@ public class ScratchController : MonoBehaviour {
         }
 
         //Debug.Log(this.gameObject.transform.worldToLocalMatrix);
-        Debug.Log(Input.mousePosition + " / " + transform.position);
 
         for (int j = 0; j < GameManager.hiddenEffectPool.Count; j++)
         {
@@ -63,13 +62,21 @@ public class ScratchController : MonoBehaviour {
                 break;
             }
         }
-        for (int i = 0; i < _randomManager.mask.Length; i++)
-        {
-            _randomManager.mask[i].SetActive(true);
-        }
-        _randomManager.mask[posNum].SetActive(false);
         _scratchManager.Scratch();
+        if (!_randomManager.scratching)
+        {
+            _randomManager._gameManager._playerControl[0].effectLabel.text = "두근 두근..";
+            _randomManager.scratching = true;
+            for (int i = 0; i < _randomManager.mask.Length; i++)
+            {
+                _randomManager.mask[i].SetActive(true);
+            }
+            _randomManager._gameManager.reTicketButton.SetActive(true);
+            _randomManager.mask[posNum].SetActive(false);
+        }
+
         gameObject.SetActive(false);
+
     }
 
     // Update is called once per frame
