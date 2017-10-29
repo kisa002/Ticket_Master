@@ -13,12 +13,16 @@ public class ScratchManager : MonoBehaviour {
     float hiddenWidth = -1;
     float hiddenHeight = -1;
 
+    public int posNum;
+
     public List<GameObject> hiddenPool = new List<GameObject>();
+    public List<ScratchController> scratchControllerPool = new List<ScratchController>();
     public GameManager _gameManager;
 
-    NetworkManager networkManager;
-
     public Sprite test;
+
+    RandomManager randomManager;
+    NetworkManager networkManager;
 
     // Use this for initialization
     void Start () {
@@ -28,7 +32,8 @@ public class ScratchManager : MonoBehaviour {
         hiddenWidth = imageHidden.GetComponent<RectTransform>().rect.width;
         hiddenHeight = imageHidden.GetComponent<RectTransform>().rect.height;
 
-        
+        randomManager = GameObject.Find("RandomManager").GetComponent<RandomManager>();
+        networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
 
         StartHidden();
 	}
@@ -44,20 +49,32 @@ public class ScratchManager : MonoBehaviour {
                 leftCount--;
             }
         }
-        if(leftCount < 90)
+        if(leftCount < 70)
         {
             if (!_gameManager.fight)
-            {
-                if(this.gameObject.transform.parent)
-                _gameManager.FightStart();
-                
+            {               
                 for (int i = 0; i < hiddenPool.Count; i++)
                 {
                     hiddenPool[i].SetActive(false);
                 }
+
+                int num = randomManager.randomData[posNum].GetDamage();
+                networkManager.StartCoroutine(networkManager.SendDamage(num));
+
+                if (this.gameObject.transform.parent)
+                    networkManager.StartCoroutine(networkManager.CheckStatus());
             }
         }
     }
+
+    public void CollOn()
+    {
+        for (int i = 0; i < hiddenPool.Count; i++)
+        {
+            hiddenPool[i].SetActive(true);
+        }
+    }
+
 
     GameObject blockPrefab;
     void StartHidden()
@@ -72,6 +89,8 @@ public class ScratchManager : MonoBehaviour {
                 hidden.GetComponent<RectTransform>().localPosition = new Vector2((-width / 2) + i, (-height / 2) + j);
                 hidden.GetComponent<RectTransform>().localScale = Vector3.one;
                 hiddenPool.Add(hidden);
+                scratchControllerPool.Add(hidden.GetComponent<ScratchController>());
+                hidden.SetActive(false);
             }
         }
 

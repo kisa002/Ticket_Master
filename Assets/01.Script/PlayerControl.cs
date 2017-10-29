@@ -30,12 +30,18 @@ public class PlayerControl : MonoBehaviour {
     public int posNum;
     public GameObject[] attackEffect;
 
+    public int num;
+    public int damage;
+
+    NetworkManager networkManager;
+
     void Start()
     {
         totalHP = hp;
         totalHpLabel.text = "/ " + totalHP.ToString();
 
         randomManager = GameObject.Find("RandomManager").GetComponent<RandomManager>();
+        networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
     }
 
     public void HpControl(int num)
@@ -57,7 +63,7 @@ public class PlayerControl : MonoBehaviour {
         StartCoroutine(HpDownColorControl(num));
     }
 
-    WaitForSeconds hpDownDelay = new WaitForSeconds(0.016f);
+    WaitForSeconds hpDownDelay = new WaitForSeconds(0.001f);
     IEnumerator HpDownCoroutine(int num)
     {
         if(num > 0)
@@ -74,15 +80,16 @@ public class PlayerControl : MonoBehaviour {
         }
         else
         {
-            if (hp > 0)
+            for (int i = 0; i < -num; i++)
             {
-                for (int i = 0; i < -num; i++)
+                if (hp > 0)
                 {
                     hp--;
                     HpSet();
                     yield return hpDownDelay;
                 }
-            }                
+
+            }
         }
     }
     public void HpSet()
@@ -91,7 +98,7 @@ public class PlayerControl : MonoBehaviour {
         hpLabel.text = hp.ToString();
     }
 
-    WaitForSeconds hpDownColorDelay = new WaitForSeconds(0.1f);
+    WaitForSeconds hpDownColorDelay = new WaitForSeconds(0.06f);
     IEnumerator HpDownColorControl(int num)
     {
         if(num > 0)
@@ -131,29 +138,24 @@ public class PlayerControl : MonoBehaviour {
     {
         if (!MainPlayer)
         {
-            if(Random.Range(0,2) == 0)
-            {
-                effectLabel.text = "라이벌의 복권은 꽝이다!!";
-                StartCoroutine("HurtEffectCoroutine");
-            }
-            else
-            {
-                int damage = -Random.Range(1, 4) * Random.Range(1, 3) * 10;
-                otherPlayerControl.HpControl(damage);
-                _animator.SetTrigger("Attack");
-                effectLabel.text = "라이벌에게" + (-damage).ToString() + "만큼 피해를 입었다!!";
-                StartCoroutine("HurtEffectCoroutine");
-            }
+            //int damage = -Random.Range(1, 4) * Random.Range(1, 3) * 10;
+            networkManager.StartCoroutine(networkManager.GetDamage());
+            int damage = -networkManager.GetEnemyDamage();
+
+            otherPlayerControl.HpControl(damage);
+            _animator.SetTrigger("Attack");
+            effectLabel.text = "라이벌에게" + (-damage).ToString() + "만큼 피해를 입었다!!";
+            StartCoroutine("HurtEffectCoroutine");
+            _gameManager.HurtSoundPlay();
         }
         else
-        {//int num = Random.Range(-60, 60);
-
-            int num = -randomManager.randomData[posNum].GetDamage();
-            if (_gameManager.timeCountDownEnd)
-            {
-                num = -1;
-            }
+        {
+            //int num = Random.Range(-60, 60);
+            //int num = -randomManager.randomData[posNum].GetDamage();
+            
             //Debug.Log("Fight : " + num);
+            //
+            /*
             if (num == -1)
             {
                 effectLabel.text = "복권을 긁지 못했다!!";
@@ -163,26 +165,38 @@ public class PlayerControl : MonoBehaviour {
                 }
                 _gameManager.WarningSoundPlay();
             }
-            else if (num == 0)
+            */
+            if (num == 0)
             {
                 if (MainPlayer)
                 {
                     effectLabel.text = "꽝!!";
                     X_image[posNum].SetActive(true);
                     StartCoroutine("XSoundPlayCoroutine");
+                    attackEffect[6].SetActive(true);
+                    _gameManager.EffectSoundPlay(6);
                 }
 
             }
             else if (num < 0)
             {
-                otherPlayerControl.HpControl(num);
+                
                 _animator.SetTrigger("Attack");
                 if (MainPlayer)
                 {
                     O_image[posNum].SetActive(true);
                     effectLabel.text = _gameManager.effectString[randomManager.randomData[posNum].GetType()];
-                    attackEffect[randomManager.randomData[posNum].GetType()].SetActive(true);
-                    _gameManager.EffectSoundPlay(randomManager.randomData[posNum].GetType());
+                    if(randomManager.randomData[posNum].GetType() == 5)
+                    {
+                        StartCoroutine(OnePunch(num));
+                    }
+                    else
+                    {
+                        otherPlayerControl.HpControl(num);
+                        attackEffect[randomManager.randomData[posNum].GetType()].SetActive(true);
+                        _gameManager.EffectSoundPlay(randomManager.randomData[posNum].GetType());
+
+                    }
                     /*
                     if (num < -50)
                     {
@@ -214,14 +228,25 @@ public class PlayerControl : MonoBehaviour {
             }
             else
             {
-                HpControl(num);
-                _animator.SetTrigger("Attack");
-                if (MainPlayer)
-                {
-                    effectLabel.text = _gameManager.effectString[6];
-                }
+                //HpControl(num);
+                //_animator.SetTrigger("Attack");
+                //if (MainPlayer)
+                //{
+                //    effectLabel.text = _gameManager.effectString[6];
+                //}
             }
         }        
+    }
+
+
+    IEnumerator OnePunch(int num)
+    {
+
+        attackEffect[7].SetActive(true);
+        yield return new WaitForSeconds(1.2f);
+        attackEffect[5].SetActive(true);
+        otherPlayerControl.HpControl(num);
+        _gameManager.EffectSoundPlay(5);
     }
     IEnumerator XSoundPlayCoroutine()
     {

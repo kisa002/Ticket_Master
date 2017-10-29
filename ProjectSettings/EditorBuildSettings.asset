@@ -4,4 +4,7 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/02.Scenes/TiketMaster.unity
+    guid: 45ebd5400ab48224db5ce26c5f552772

@@ -9,14 +9,11 @@ public class MouseController : MonoBehaviour {
     void Start () {
         preMousePosition = Vector2.zero;
 	}
-
-    // Update is called once per frame
-    /*
-    void Update()
+    
+    private void FixedUpdate()
     {
         CheckMouse();
     }
-    */
 
     void CheckMouse()
     {
@@ -26,7 +23,7 @@ public class MouseController : MonoBehaviour {
         //            Destroy(this.gameObject);
         if (Input.GetMouseButtonDown(0))
         {
-            preMousePosition = Input.mousePosition;
+            preMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
 
         if (Input.GetMouseButton(0))
@@ -35,8 +32,8 @@ public class MouseController : MonoBehaviour {
                 return;
 
             RaycastHit2D[] hits;
-            Vector2 interval = (Vector2)Input.mousePosition - preMousePosition;
-            hits = Physics2D.RaycastAll(Input.mousePosition, interval.normalized, interval.magnitude);
+            Vector2 interval = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - preMousePosition;
+            hits = Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition), interval.normalized, interval.magnitude);
             if (hits == null)
                 return;
             else
@@ -45,13 +42,13 @@ public class MouseController : MonoBehaviour {
                 {
                     if (hit.collider.tag == "UIMask")
                     {
-                        hit.collider.gameObject.SetActive(false);
+                        hit.collider.GetComponent<ScratchController>().Explode();
                     }
                 }
             }
 
-            Debug.DrawLine(preMousePosition, Input.mousePosition, Color.green, 10f);
-            preMousePosition = Input.mousePosition;
+            Debug.DrawLine(preMousePosition, Camera.main.ScreenToWorldPoint(Input.mousePosition), Color.green, 10f);
+            preMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
 
         if (Input.GetMouseButtonUp(0))

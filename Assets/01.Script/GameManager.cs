@@ -18,8 +18,6 @@ public class GameManager : MonoBehaviour {
     public bool fight;
 
     public GameObject startBack;
-    public GAui[] startPlayerGaui;
-    public GAui vsGaui;
     public GameObject reTicketButton;
 
     public Sprite[,] scratchSprite = new Sprite[2,9];
@@ -37,17 +35,26 @@ public class GameManager : MonoBehaviour {
     public GameObject[] ticket;
 
     public AudioSource _audioSource;
+
+    public AudioSource scratchAudioSource;
     public AudioClip[] effectSound;
     public AudioClip xSound;
     public AudioClip warningSound;
+    public AudioClip hurtSound;
+    public AudioClip scratchSound;
 
     public AudioSource musicManager;
+
+    NetworkManager networkManager;
 
 
     // Use this for initialization
     void Awake () {
         //Application.targetFrameRate = 60;
-        StartGame();
+        //StartGame();
+
+        networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+
         CreateHiddenEffect();
 
         for (int i = 0; i < 2; i++)
@@ -59,11 +66,6 @@ public class GameManager : MonoBehaviour {
     }
     
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
 
 
     void CreateHiddenEffect()
@@ -95,27 +97,15 @@ public class GameManager : MonoBehaviour {
     {
         StopCoroutine("TimeCountDownCoroutine");
         startBack.SetActive(true);
-        vsGaui.gameObject.SetActive(true);
-        vsGaui.MoveIn();
-        yield return new WaitForSeconds(1);
-        for (int i = 0; i < startPlayerGaui.Length; i++)
-        {
-            startPlayerGaui[i].gameObject.SetActive(true);
-            startPlayerGaui[i].MoveIn();
-        }
-        yield return new WaitForSeconds(3.6f);
-        for (int i = 0; i < startPlayerGaui.Length; i++)
-        {
-            startPlayerGaui[i].MoveOut();
-        }
-        vsGaui.MoveOut();
-        yield return new WaitForSeconds(0.6f);
+
+        yield return new WaitForSeconds(3f);
+
         startBack.SetActive(false);
         _randomManager.RandomMix();
         
     }
     public bool timeCountDownEnd;
-    WaitForSeconds timeCountDownDelay = new WaitForSeconds(1f);
+    WaitForSeconds timeCountDownDelay = new WaitForSeconds(0.8f);
     IEnumerator TimeCountDownCoroutine()
     {
         timeCountDownEnd = false;
@@ -129,7 +119,8 @@ public class GameManager : MonoBehaviour {
             yield return timeCountDownDelay;
         }
         timeCountDownEnd = true;
-        FightStart();
+        ////FightStart();
+
     }
 
     public void RefreshTicketUse()
@@ -152,7 +143,10 @@ public class GameManager : MonoBehaviour {
                 break;
             }
         }
-        
+        if (!refreshTicket[0].activeSelf)
+        {
+            reTicketButton.SetActive(true);
+        }
     }
     public void Refresh()
     {
@@ -170,17 +164,25 @@ public class GameManager : MonoBehaviour {
 
         StartCoroutine("FightCoroutine");
     }
+    public GameObject confetti;
     IEnumerator FightCoroutine()
     {
         yield return new WaitForSeconds(0.4f);
         _playerControl[0].Fight();
         yield return new WaitForSeconds(2f);
         _playerControl[1].Fight();
-        yield return new WaitForSeconds(1.8f);
-        fight = false;
+        yield return new WaitForSeconds(2f);
+        if (_randomManager.randomData[_playerControl[0].posNum].GetType() == 5)
+        {
+            if(_randomManager.randomData[_playerControl[0].posNum].GetDamage() != 0)
+            {
+                yield return new WaitForSeconds(3.2f);
+            }
+        }
+            fight = false;
         if(_playerControl[0].hp <= 0)
         {
-            gameOverLabel.text = "패배..";
+            gameOverLabel.text = "죽었습니다..";
             GameOver();
         }
         else if (_playerControl[1].hp <= 0)
@@ -188,6 +190,7 @@ public class GameManager : MonoBehaviour {
             gameOverLabel.text = "승리!!";
             GameOver();
             _playerControl[1]._animator.SetTrigger("Die");
+            confetti.SetActive(true);
         }
         else
         {
@@ -226,6 +229,15 @@ public class GameManager : MonoBehaviour {
     public void WarningSoundPlay()
     {
         _audioSource.PlayOneShot(warningSound);
+    }
+    public void HurtSoundPlay()
+    {
+        _audioSource.PlayOneShot(hurtSound);
+    }
+    public void ScratchSoundPlay()
+    {
+        scratchAudioSource.Stop();
+        scratchAudioSource.PlayOneShot(scratchSound);
     }
 
 }
